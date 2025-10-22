@@ -1,13 +1,4 @@
-// const BASE_URL = "http://localhost:8000/productservice/products";
-// export const fetchAllProducts = async () => {
-//   const res = await fetch(`${BASE_URL}/getAllProducts`);
-//   if (!res.ok) throw new Error("Failed to fetch products");
-//
-//   return res.json();
-// };
-
-
-const BASE_URL = "http://localhost:8000/productservice/products";
+const BASE_URL = "http://localhost:8081/productservice/products";
 import { authHeaders, getAuthToken } from "./_auth";
 
 const withAuth = () => ({ ...authHeaders(getAuthToken()) });

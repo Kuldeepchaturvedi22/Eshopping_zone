@@ -1,185 +1,315 @@
-import React, { useState } from 'react';
-import {
-    Box,
-    Typography,
-    Grid,
-    Card,
-    CardContent,
-    Avatar,
-    Divider,
-    List,
-    ListItem,
-    ListItemText,
-    Badge,
-    Chip,
-    Paper
-} from '@mui/material';
-import {
-    Store as StoreIcon,
-    ShoppingCart as CartIcon,
-    LocalAtm as WalletIcon,
-    Notifications as NotificationIcon
-} from '@mui/icons-material';
+// import React, { useEffect, useMemo, useState } from "react";
+// import { fetchProductsByMerchantEmail } from "../api/merchant";
+// import { fetchOrdersByMerchantEmail } from "../api/order";
+// import { getAuthToken } from "../api/_auth";
+//
+// export default function MerchantDashboard() {
+//     const email = localStorage.getItem("email") || "";
+//     const token = getAuthToken();
+//
+//     const [products, setProducts] = useState([]);
+//     const [orders, setOrders] = useState([]);
+//     const [loading, setLoading] = useState(true);
+//     const [err, setErr] = useState("");
+//
+//     const totalSales = useMemo(() => {
+//         return orders.reduce((s, o) => s + Number(o.amountPaid ?? o.total ?? 0), 0);
+//     }, [orders]);
+//
+//     const load = async () => {
+//         setLoading(true);
+//         setErr("");
+//         try {
+//             const [prods, ords] = await Promise.all([
+//                 fetchProductsByMerchantEmail(email, token),
+//                 fetchOrdersByMerchantEmail(email, token),
+//             ]);
+//             setProducts(Array.isArray(prods) ? prods : []);
+//             setOrders(Array.isArray(ords) ? ords : []);
+//         } catch (e) {
+//             setErr(e?.message || "Failed to load dashboard");
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+//
+//     useEffect(() => {
+//         load();
+//     }, []);
+//
+//     if (loading) {
+//         return (
+//             <div className="max-w-6xl mx-auto p-4 mt-16">
+//                 <div className="grid md:grid-cols-3 gap-4">
+//                     <div className="h-28 bg-gray-100 rounded animate-pulse" />
+//                     <div className="h-28 bg-gray-100 rounded animate-pulse" />
+//                     <div className="h-28 bg-gray-100 rounded animate-pulse" />
+//                 </div>
+//             </div>
+//         );
+//     }
+//
+//     if (err) {
+//         return (
+//             <div className="max-w-6xl mx-auto p-4 mt-16">
+//                 <div className="p-3 bg-red-50 text-red-700 border border-red-200 rounded">
+//                     {err}
+//                 </div>
+//             </div>
+//         );
+//     }
+//
+//     return (
+//         <div className="max-w-6xl mx-auto p-4 mt-16">
+//             {/* Header */}
+//             <div className="mb-6">
+//                 <h1 className="text-2xl font-bold">Merchant Dashboard</h1>
+//                 <p className="text-sm text-gray-600">Signed in as {email}</p>
+//             </div>
+//
+//             {/* KPIs */}
+//             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+//                 <div className="bg-white rounded-xl shadow p-5">
+//                     <p className="text-sm text-gray-500">My Products</p>
+//                     <p className="text-3xl font-bold text-blue-700">{products.length}</p>
+//                 </div>
+//                 <div className="bg-white rounded-xl shadow p-5">
+//                     <p className="text-sm text-gray-500">Orders Received</p>
+//                     <p className="text-3xl font-bold text-indigo-700">{orders.length}</p>
+//                 </div>
+//                 <div className="bg-white rounded-xl shadow p-5">
+//                     <p className="text-sm text-gray-500">Total Sales</p>
+//                     <p className="text-3xl font-bold text-emerald-700">₹{totalSales.toFixed(2)}</p>
+//                 </div>
+//             </div>
+//
+//             {/* Product list */}
+//             <div className="mb-8">
+//                 <div className="flex items-center justify-between mb-3">
+//                     <h2 className="text-xl font-semibold">My Products</h2>
+//                     <button
+//                         onClick={load}
+//                         className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+//                     >
+//                         Refresh
+//                     </button>
+//                 </div>
+//                 {products.length === 0 ? (
+//                     <p className="text-gray-500">No products found.</p>
+//                 ) : (
+//                     <div className="grid md:grid-cols-3 gap-4">
+//                         {products.map((p) => (
+//                             <div key={p.productId} className="bg-white rounded-xl shadow p-4">
+//                                 <img
+//                                     src={p.image}
+//                                     alt={p.productName}
+//                                     className="w-full h-40 object-cover rounded mb-3"
+//                                 />
+//                                 <div className="font-semibold">{p.productName}</div>
+//                                 <div className="text-sm text-gray-600 line-clamp-2">{p.description}</div>
+//                                 <div className="mt-1 text-sm">
+//                                     <span className="font-semibold">₹{p.price}</span>
+//                                     <span className="ml-2 text-green-700">{p.discount}% off</span>
+//                                 </div>
+//                                 <div className="text-xs text-gray-500">Stock: {p.stock}</div>
+//                             </div>
+//                         ))}
+//                     </div>
+//                 )}
+//             </div>
+//
+//             {/* Orders list */}
+//             <div className="mb-8">
+//                 <h2 className="text-xl font-semibold mb-3">Latest Orders</h2>
+//                 {orders.length === 0 ? (
+//                     <p className="text-gray-500">No orders yet.</p>
+//                 ) : (
+//                     <div className="grid md:grid-cols-2 gap-4">
+//                         {orders
+//                             .slice()
+//                             .sort((a, b) => Number((b.orderId ?? b.id) || 0) - Number((a.orderId ?? a.id) || 0))
+//                             .slice(0, 8)
+//                             .map((o) => {
+//                                 const id = o.orderId ?? o.id;
+//                                 const status = o.orderStatus ?? o.status ?? "";
+//                                 const amount = o.amountPaid ?? o.total ?? "—";
+//                                 const date = o.orderDate ?? o.date ?? "—";
+//                                 return (
+//                                     <div key={id} className="bg-white rounded-xl shadow p-4">
+//                                         <div className="flex items-center justify-between">
+//                                             <div className="font-medium">Order #{id}</div>
+//                                             <span className="px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-700">
+//                                                 {status}
+//                                             </span>
+//                                         </div>
+//                                         <div className="text-sm text-gray-600 mt-1">
+//                                             <div>Date: {date}</div>
+//                                             <div>Amount: ₹{String(amount)}</div>
+//                                         </div>
+//                                     </div>
+//                                 );
+//                             })}
+//                     </div>
+//                 )}
+//             </div>
+//         </div>
+//     );
+// }
+
+import React, { useEffect, useMemo, useState } from "react";
+import { fetchProductsByMerchantEmail } from "../api/merchant";
+import { fetchOrdersByMerchantEmail } from "../api/order";
+import { getAuthToken } from "../api/_auth";
 
 export default function MerchantDashboard() {
-    // Dummy data - would come from backend in a real implementation
-    const [merchant] = useState({
-        name: "John's Store",
-        email: "john@example.com",
-        joinDate: "Jan 2023",
-        avatar: "https://randomuser.me/api/portraits/men/1.jpg"
-    });
+    const email = localStorage.getItem("email") || "";
+    const token = getAuthToken();
 
-    const [stats] = useState({
-        totalSales: "$12,450",
-        totalOrders: 156,
-        pendingOrders: 8,
-        walletBalance: "$3,245.50",
-        availableForWithdrawal: "$2,850.00",
-        pendingFunds: "$395.50"
-    });
+    const [products, setProducts] = useState([]);
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [err, setErr] = useState("");
 
-    const [recentOrders] = useState([
-        { id: "#ORD-5523", customer: "Sarah Johnson", amount: "$125.00", status: "Delivered", date: "Aug 15, 2023" },
-        { id: "#ORD-5524", customer: "Mike Peters", amount: "$78.50", status: "Processing", date: "Aug 14, 2023" },
-        { id: "#ORD-5525", customer: "Emma Wilson", amount: "$245.00", status: "Pending", date: "Aug 14, 2023" },
-        { id: "#ORD-5526", customer: "Tom Smith", amount: "$56.25", status: "Delivered", date: "Aug 13, 2023" },
-    ]);
+    const totalSales = useMemo(() => {
+        return orders.reduce((s, o) => s + Number(o.amountPaid ?? o.total ?? 0), 0);
+    }, [orders]);
+
+    const load = async () => {
+        setLoading(true);
+        setErr("");
+        try {
+            const [prods, ords] = await Promise.all([
+                fetchProductsByMerchantEmail(email, token),
+                fetchOrdersByMerchantEmail(email, token),
+            ]);
+            setProducts(Array.isArray(prods) ? prods : []);
+            setOrders(Array.isArray(ords) ? ords : []);
+        } catch (e) {
+            setErr(e?.message || "Failed to load dashboard");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        load();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="max-w-6xl mx-auto p-4 mt-16">
+                <div className="grid md:grid-cols-3 gap-4">
+                    <div className="h-28 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                    <div className="h-28 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                    <div className="h-28 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                </div>
+            </div>
+        );
+    }
+
+    if (err) {
+        return (
+            <div className="max-w-6xl mx-auto p-4 mt-16">
+                <div className="p-3 bg-red-50 dark:bg-red-900 text-red-700 dark:text-red-200 border border-red-200 dark:border-red-700 rounded">
+                    {err}
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <Box sx={{ padding: 3 }}>
-            {/* Header with merchant info */}
-            <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-                <Grid container spacing={2} alignItems="center">
-                    <Grid item>
-                        <Avatar
-                            src={merchant.avatar}
-                            alt={merchant.name}
-                            sx={{ width: 70, height: 70 }}
-                        />
-                    </Grid>
-                    <Grid item xs>
-                        <Typography variant="h4">{merchant.name}</Typography>
-                        <Typography variant="body1" color="text.secondary">
-                            {merchant.email} • Member since {merchant.joinDate}
-                        </Typography>
-                    </Grid>
-                    <Grid item>
-                        <Badge badgeContent={3} color="error">
-                            <NotificationIcon />
-                        </Badge>
-                    </Grid>
-                </Grid>
-            </Paper>
+        <div className="max-w-6xl mx-auto p-4 mt-16 text-gray-900 dark:text-gray-100">
+            {/* Header */}
+            <div className="mb-6">
+                <h1 className="text-2xl font-bold">Merchant Dashboard</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Signed in as {email}</p>
+            </div>
 
-            {/* Stats Summary */}
-            <Grid container spacing={3} sx={{ mb: 3 }}>
-                <Grid item xs={12} md={4}>
-                    <Card sx={{ height: '100%' }}>
-                        <CardContent>
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <StoreIcon color="primary" sx={{ mr: 1 }} />
-                                <Typography variant="h6">Store Overview</Typography>
-                            </Box>
-                            <Divider sx={{ my: 1.5 }} />
-                            <Typography variant="body1">Total Sales: {stats.totalSales}</Typography>
-                            <Typography variant="body1">Total Orders: {stats.totalOrders}</Typography>
-                            <Typography variant="body1" color="warning.main">
-                                Pending Orders: {stats.pendingOrders}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
+            {/* KPIs */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-5">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">My Products</p>
+                    <p className="text-3xl font-bold text-blue-700 dark:text-blue-400">{products.length}</p>
+                </div>
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-5">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Orders Received</p>
+                    <p className="text-3xl font-bold text-indigo-700 dark:text-indigo-400">{orders.length}</p>
+                </div>
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-5">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Total Sales</p>
+                    <p className="text-3xl font-bold text-emerald-700 dark:text-emerald-400">₹{totalSales.toFixed(2)}</p>
+                </div>
+            </div>
 
-                <Grid item xs={12} md={4}>
-                    <Card sx={{ height: '100%' }}>
-                        <CardContent>
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <CartIcon color="secondary" sx={{ mr: 1 }} />
-                                <Typography variant="h6">Recent Orders</Typography>
-                            </Box>
-                            <Divider sx={{ my: 1.5 }} />
-                            <List dense disablePadding>
-                                {recentOrders.slice(0, 3).map((order) => (
-                                    <ListItem key={order.id} disablePadding sx={{ py: 0.5 }}>
-                                        <ListItemText
-                                            primary={`${order.id} - ${order.customer}`}
-                                            secondary={`${order.amount} • ${order.date}`}
-                                        />
-                                        <Chip
-                                            label={order.status}
-                                            size="small"
-                                            color={
-                                                order.status === "Delivered" ? "success" :
-                                                    order.status === "Processing" ? "info" : "warning"
-                                            }
-                                        />
-                                    </ListItem>
-                                ))}
-                            </List>
-                        </CardContent>
-                    </Card>
-                </Grid>
-
-                <Grid item xs={12} md={4}>
-                    <Card sx={{ height: '100%' }}>
-                        <CardContent>
-                            <Box display="flex" alignItems="center" mb={1}>
-                                <WalletIcon color="success" sx={{ mr: 1 }} />
-                                <Typography variant="h6">Wallet</Typography>
-                            </Box>
-                            <Divider sx={{ my: 1.5 }} />
-                            <Typography variant="h5" sx={{ mb: 1 }}>
-                                {stats.walletBalance}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                Available for withdrawal: {stats.availableForWithdrawal}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                Pending: {stats.pendingFunds}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            </Grid>
-
-            {/* All Orders */}
-            <Card>
-                <CardContent>
-                    <Typography variant="h6" gutterBottom>All Recent Orders</Typography>
-                    <Divider sx={{ mb: 2 }} />
-                    <List>
-                        {recentOrders.map((order) => (
-                            <React.Fragment key={order.id}>
-                                <ListItem>
-                                    <Grid container>
-                                        <Grid item xs={3}>
-                                            <Typography variant="body1">{order.id}</Typography>
-                                            <Typography variant="body2" color="text.secondary">{order.date}</Typography>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Typography variant="body1">{order.customer}</Typography>
-                                        </Grid>
-                                        <Grid item xs={3}>
-                                            <Typography variant="body1">{order.amount}</Typography>
-                                        </Grid>
-                                        <Grid item xs={3} textAlign="right">
-                                            <Chip
-                                                label={order.status}
-                                                color={
-                                                    order.status === "Delivered" ? "success" :
-                                                        order.status === "Processing" ? "info" : "warning"
-                                                }
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                </ListItem>
-                                <Divider />
-                            </React.Fragment>
+            {/* Product list */}
+            <div className="mb-8">
+                <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-xl font-semibold">My Products</h2>
+                    <button
+                        onClick={load}
+                        className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        Refresh
+                    </button>
+                </div>
+                {products.length === 0 ? (
+                    <p className="text-gray-500 dark:text-gray-400">No products found.</p>
+                ) : (
+                    <div className="grid md:grid-cols-3 gap-4">
+                        {products.map((p) => (
+                            <div key={p.productId} className="bg-white dark:bg-gray-900 rounded-xl shadow p-4">
+                                <img
+                                    src={p.image}
+                                    alt={p.productName}
+                                    className="w-full h-40 object-cover rounded mb-3"
+                                />
+                                <div className="font-semibold">{p.productName}</div>
+                                <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{p.description}</div>
+                                <div className="mt-1 text-sm">
+                                    <span className="font-semibold">₹{p.price}</span>
+                                    <span className="ml-2 text-green-700 dark:text-green-400">{p.discount}% off</span>
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">Stock: {p.stock}</div>
+                            </div>
                         ))}
-                    </List>
-                </CardContent>
-            </Card>
-        </Box>
+                    </div>
+                )}
+            </div>
+
+            {/* Orders list */}
+            <div className="mb-8">
+                <h2 className="text-xl font-semibold mb-3">Latest Orders</h2>
+                {orders.length === 0 ? (
+                    <p className="text-gray-500 dark:text-gray-400">No orders yet.</p>
+                ) : (
+                    <div className="grid md:grid-cols-2 gap-4">
+                        {orders
+                            .slice()
+                            .sort((a, b) => Number((b.orderId ?? b.id) || 0) - Number((a.orderId ?? a.id) || 0))
+                            .slice(0, 8)
+                            .map((o) => {
+                                const id = o.orderId ?? o.id;
+                                const status = o.orderStatus ?? o.status ?? "";
+                                const amount = o.amountPaid ?? o.total ?? "—";
+                                const date = o.orderDate ?? o.date ?? "—";
+                                return (
+                                    <div key={id} className="bg-white dark:bg-gray-900 rounded-xl shadow p-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="font-medium">Order #{id}</div>
+                                            <span className="px-2 py-0.5 text-xs rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                                                {status}
+                                            </span>
+                                        </div>
+                                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                            <div>Date: {date}</div>
+                                            <div>Amount: ₹{String(amount)}</div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                    </div>
+                )}
+            </div>
+        </div>
     );
 }

@@ -12,45 +12,41 @@ export default function PaymentSuccess() {
     const [orderId, setOrderId] = useState("");
     const [amount, setAmount] = useState("");
 
-    // Extract values returned by your payment service
     const query = useMemo(() => new URLSearchParams(location.search), [location.search]);
 
     useEffect(() => {
         const id = query.get("orderId") || query.get("order") || "";
         const amt = query.get("amount") || query.get("amt") || "";
-        const status = (query.get("status") || "SUCCESS").toUpperCase(); // default SUCCESS
+        const status = (query.get("status") || "SUCCESS").toUpperCase();
         setOrderId(id);
         setAmount(amt);
 
-        // Call your backend to mark payment status
+        const broadcast = (st) => {
+            try {
+                const payload = { orderId: id || "", status: st, amount: amt || "", ts: Date.now() };
+                localStorage.setItem("payment:last", JSON.stringify(payload));
+            } catch {}
+        };
+
         const run = async () => {
             if (!id) {
                 setMsg("Missing order id");
                 setUpdating(false);
                 setOk(false);
+                broadcast("ERROR");
                 return;
             }
             try {
                 const token = getAuthToken();
-                const res = await fetch(
-                    `http://localhost:8000/paymentservice/payment/update-status/${encodeURIComponent(
-                        id
-                    )}/${encodeURIComponent(status)}`,
-                    {
-                        method: "PUT",
-                        headers: token ? { Authorization: `Bearer ${token}` } : {},
-                    }
-                );
-                if (!res.ok) {
-                    const t = await res.text().catch(() => "");
-                    throw new Error(t || `Failed to update payment status (${res.status})`);
-                }
+                // Optional: You might already have updated status on backend. If you need to call update-status endpoint, do it here.
                 setOk(status === "SUCCESS");
                 setMsg(status === "SUCCESS" ? "Payment captured successfully." : "Payment status updated.");
+                broadcast(status);
             } catch (e) {
                 console.error("Error updating payment status:", e);
                 setOk(false);
                 setMsg(e?.message || "Unable to update payment status.");
+                broadcast("ERROR");
             } finally {
                 setUpdating(false);
             }
@@ -58,10 +54,10 @@ export default function PaymentSuccess() {
 
         run();
 
-        // Auto redirect to Orders page after a short delay on success
-        const t = setTimeout(() => navigate("/orders", { replace: true }), 1800);
+        const t = setTimeout(() => navigate("/orders", { replace: true }), 1500);
         return () => clearTimeout(t);
     }, [query, navigate]);
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 px-4">

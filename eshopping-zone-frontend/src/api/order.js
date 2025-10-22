@@ -1,7 +1,7 @@
 // // File: 'src/api/order.js'
 // import { authHeaders } from "./_auth";
 //
-// const BASE_URL = "http://localhost:8000/orderservice/orders";
+// const BASE_URL = "http://localhost:8081/orderservice/orders";
 //
 // // Place a new order (Customer)
 // export const placeOrder = async (token) => {
@@ -100,7 +100,7 @@
 //
 // export const fetchUserAddress = async (userId, token) => {
 //     const res = await fetch(
-//         `http://localhost:8000/userservice/user/${userId}/address`,
+//         `http://localhost:8081/userservice/user/${userId}/address`,
 //         { headers: { ...authHeaders(token) } }
 //     );
 //     if (!res.ok) throw new Error("Failed to fetch user address");
@@ -131,7 +131,7 @@
 // File: 'src/api/order.js'
 import { authHeaders } from "./_auth";
 
-const BASE_URL = "http://localhost:8000/orderservice/orders";
+const BASE_URL = "http://localhost:8081/orderservice/orders";
 
 // Place a new order (Customer)
 export const placeOrder = async (token) => {
@@ -224,6 +224,7 @@ export const fetchLatestOrders = async (token) => {
     return res.json();
 };
 
+
 export const fetchOrderProducts = async (orderId, token) => {
     const res = await fetch(`${BASE_URL}/${orderId}/products`, {
         headers: { ...authHeaders(token) },
@@ -234,9 +235,17 @@ export const fetchOrderProducts = async (orderId, token) => {
 
 export const fetchUserAddress = async (userId, token) => {
     const res = await fetch(
-        `http://localhost:8000/userservice/user/${userId}/address`,
+        `http://localhost:8081/userservice/user/${userId}/address`,
         { headers: { ...authHeaders(token) } }
     );
     if (!res.ok) throw new Error("Failed to fetch user address");
+    return res.json();
+};
+
+export const fetchOrdersByMerchantEmail = async (email, token) => {
+    const url = `${BASE_URL}/getAllOrdersByMerchantEmail?email=${encodeURIComponent(email)}`;
+    const res = await fetch(url, { headers: { ...authHeaders(token) } });
+    if (res.status === 401) throw new Error("Unauthorized. Please log in again.");
+    if (!res.ok) throw new Error("Failed to fetch merchant orders");
     return res.json();
 };

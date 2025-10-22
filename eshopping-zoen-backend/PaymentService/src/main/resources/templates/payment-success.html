@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Payment Successful</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            text-align: center;
+            margin-top: 80px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        h2 {
+            font-size: 2rem;
+            color: #00e676;
+        }
+        a {
+            color: #64b5f6;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #1e88e5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #1565c0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>✅ Payment Successful!</h2>
+    <p>Your payment has been processed successfully.</p>
+    <p>You will receive a confirmation email shortly.</p>
+    <br />
+    <button class="button" onclick="redirectToOrders()">📦 View My Orders</button>
+    <p style="margin-top: 10px;">
+        If the button doesn't work,
+        <a href="http://localhost:5173/orders" target="_blank" rel="noopener">click here to view your orders</a>.</p>
+</div>
+    <script>
+        function redirectToOrders() {
+            try {
+                window.open('http://localhost:5173/orders', '_blank', 'noopener');
+            } catch (e) {
+                console && console.warn && console.warn('Could not open orders tab:', e);
+            }
+        }
+
+        // Optional: auto-open after delay
+        setTimeout(() => {
+            redirectToOrders();
+        }, 3000); // 3 seconds delay
+    </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8000/cartservice/carts";
+const BASE_URL = "http://localhost:8081/cartservice/carts";
 import { authHeaders, getAuthToken } from "./_auth";
 
 const withAuth = (token) => authHeaders(getAuthToken(token));

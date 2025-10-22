@@ -1,6 +1,6 @@
 import { authHeaders } from "./_auth";
 
-const BASE_URL = "http://localhost:8000/notificationservice/notification";
+const BASE_URL = "http://localhost:8081/notificationservice/notification";
 
 export const sendMail = async (details, token) => {
     const res = await fetch(`${BASE_URL}/sendMail`, {
