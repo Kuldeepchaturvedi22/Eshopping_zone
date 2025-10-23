@@ -1,0 +1,99 @@
+name: Deploy to AWS EKS
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  AWS_REGION: us-west-2
+  EKS_CLUSTER_NAME: e-shopping-zone
+  ECR_REPOSITORY: e-shopping-zone
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Cache Maven packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build and test UserService
+      run: |
+        cd UserService
+        mvn clean compile test
+        mvn package -DskipTests
+
+    - name: Build and push UserService Docker image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd UserService
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY/user-service:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY/user-service:$IMAGE_TAG
+
+    - name: Build and test ProductService
+      run: |
+        cd ProductService
+        mvn clean compile test
+        mvn package -DskipTests
+
+    - name: Build and push ProductService Docker image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd ProductService
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY/product-service:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY/product-service:$IMAGE_TAG
+
+    - name: Update kube config
+      run: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+
+    - name: Deploy to EKS
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Update image tags in Kubernetes manifests
+        sed -i "s|your-registry|$ECR_REGISTRY/$ECR_REPOSITORY|g" k8s/*.yaml
+        sed -i "s|:latest|:$IMAGE_TAG|g" k8s/*.yaml
+        
+        # Apply Kubernetes manifests
+        kubectl apply -f k8s/namespace.yaml
+        kubectl apply -f k8s/secrets.yaml
+        kubectl apply -f k8s/mysql-deployment.yaml
+        kubectl apply -f k8s/eureka-server.yaml
+        kubectl apply -f k8s/user-service.yaml
+        kubectl apply -f k8s/api-gateway.yaml
+        kubectl apply -f k8s/hpa.yaml
+        
+        # Wait for deployment
+        kubectl rollout status deployment/user-service -n e-shopping-zone
+        kubectl rollout status deployment/api-gateway -n e-shopping-zone

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Alert - E-Shopping Zone</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+        .content { padding: 40px 30px; }
+        .alert-box { background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 10px; padding: 20px; margin: 20px 0; }
+        .login-details { background: #f8f9fa; border-radius: 10px; padding: 20px; margin: 20px 0; }
+        .detail-row { display: flex; justify-content: space-between; margin: 10px 0; padding: 8px 0; border-bottom: 1px solid #e9ecef; }
+        .detail-label { font-weight: 600; color: #495057; }
+        .detail-value { color: #6c757d; }
+        .security-tip { background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 10px; padding: 20px; margin: 20px 0; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 14px; }
+        .btn { display: inline-block; padding: 12px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 25px; font-weight: 600; margin: 10px 0; }
+        .emoji { font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="emoji">🔐</div>
+            <h1>Login Alert</h1>
+            <p>Security notification for your account</p>
+        </div>
+        
+        <div class="content">
+            <div class="alert-box">
+                <h3 style="margin-top: 0; color: #856404;">🚨 Account Access Detected</h3>
+                <p>We detected a new login to your E-Shopping Zone account. If this was you, no action is needed.</p>
+            </div>
+            
+            <div class="login-details">
+                <h3 style="margin-top: 0; color: #495057;">Login Details:</h3>
+                <div class="detail-row">
+                    <span class="detail-label">📧 Email:</span>
+                    <span class="detail-value" th:text="${email}">user@example.com</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">🕒 Time:</span>
+                    <span class="detail-value" th:text="${loginTime}">2024-01-15 10:30 AM</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">🌍 IP Address:</span>
+                    <span class="detail-value" th:text="${ipAddress}">192.168.1.1</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">💻 Device:</span>
+                    <span class="detail-value" th:text="${userAgent}">Chrome Browser</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">📍 Location:</span>
+                    <span class="detail-value" th:text="${location}">Unknown</span>
+                </div>
+            </div>
+            
+            <div class="security-tip">
+                <h3 style="margin-top: 0; color: #0c5460;">🛡️ Security Reminder</h3>
+                <p><strong>If this wasn't you:</strong></p>
+                <ul>
+                    <li>Change your password immediately</li>
+                    <li>Review your account activity</li>
+                    <li>Contact our support team</li>
+                </ul>
+                <a href="#" class="btn">Secure My Account</a>
+            </div>
+            
+            <p style="text-align: center; margin-top: 30px;">
+                <strong>Happy Shopping! 🛍️</strong><br>
+                The E-Shopping Zone Team
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>This is an automated security notification from E-Shopping Zone.</p>
+            <p>© 2024 E-Shopping Zone. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

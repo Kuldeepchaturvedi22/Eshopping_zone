@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to E-Shopping Zone</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+        .logo { font-size: 28px; font-weight: bold; margin-bottom: 10px; }
+        .content { padding: 40px 30px; }
+        .welcome-box { background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 20px 0; }
+        .credentials-box { background-color: #e8f4fd; border: 1px solid #b3d9ff; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .btn { display: inline-block; background-color: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+        .footer { background-color: #2c3e50; color: white; padding: 20px; text-align: center; font-size: 12px; }
+        .security-note { background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🛒 E-Shopping Zone</div>
+            <p>Your Premium Online Shopping Destination</p>
+        </div>
+        
+        <div class="content">
+            <div class="welcome-box">
+                <h2 style="color: #2c3e50; margin-top: 0;">Welcome to Our Community!</h2>
+                <p>Thank you for joining E-Shopping Zone. We're excited to have you as part of our growing community of smart shoppers.</p>
+            </div>
+            
+            <h3 style="color: #2c3e50;">Your Account Details</h3>
+            <div class="credentials-box">
+                <p><strong>Email:</strong> <span th:text="${email}">user@example.com</span></p>
+                <p><strong>Temporary Password:</strong> <code th:text="${password}">temp123</code></p>
+                <p style="margin-bottom: 0;"><em>Please change your password after first login for security.</em></p>
+            </div>
+            
+            <div class="security-note">
+                <h4 style="margin-top: 0; color: #856404;">🔒 Security Reminder</h4>
+                <ul style="margin-bottom: 0;">
+                    <li>Change your password immediately after first login</li>
+                    <li>Use a strong, unique password</li>
+                    <li>Never share your login credentials</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="http://localhost:3000/login" class="btn">Login to Your Account</a>
+            </div>
+            
+            <h3 style="color: #2c3e50;">What's Next?</h3>
+            <ul>
+                <li>Complete your profile information</li>
+                <li>Browse our extensive product catalog</li>
+                <li>Set up your delivery preferences</li>
+                <li>Start shopping with exclusive member discounts</li>
+            </ul>
+            
+            <p>If you have any questions or need assistance, our customer support team is here to help 24/7.</p>
+        </div>
+        
+        <div class="footer">
+            <p><strong>E-Shopping Zone Inc.</strong></p>
+            <p>📧 support@e-shopping-zone.com | 📞 +1-800-123-4567</p>
+            <p>This is an automated message. Please do not reply to this email.</p>
+            <p style="margin-top: 15px; font-size: 10px;">© 2024 E-Shopping Zone. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

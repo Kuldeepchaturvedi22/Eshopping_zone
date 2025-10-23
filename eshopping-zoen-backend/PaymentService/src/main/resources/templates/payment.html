@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing Payment...</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .btn:hover { background: #0056b3; }
+        .debug-info {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 12px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="loading" style="display: block;">
+        <div class="spinner"></div>
+        <h3>Initializing Payment...</h3>
+        <p>Please wait while we set up your payment...</p>
+    </div>
+    
+    <div id="error" style="display: none;">
+        <h3>Payment Error</h3>
+        <p>Unable to initialize payment. Please try again.</p>
+        <button class="btn" onclick="retryPayment()">Retry</button>
+        <button class="btn" onclick="goBack()">Go Back</button>
+    </div>
+    
+    <div class="debug-info">
+        <strong>Debug Info:</strong><br>
+        Key ID: <span th:text="${keyId}">Not loaded</span><br>
+        Amount: <span th:text="${amount}">Not loaded</span><br>
+        Order ID: <span th:text="${orderId}">Not loaded</span>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    // Get values from Thymeleaf
+    const RAZORPAY_KEY = /*[[${keyId}]]*/ '';
+    const PAYMENT_AMOUNT = /*[[${amount}]]*/ 0;
+    const RAZORPAY_ORDER_ID = /*[[${orderId}]]*/ '';
+    
+    console.log('Payment Data:', {
+        key: RAZORPAY_KEY,
+        amount: PAYMENT_AMOUNT,
+        orderId: RAZORPAY_ORDER_ID
+    });
+    
+    function showError() {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+    }
+    
+    function retryPayment() {
+        document.getElementById('error').style.display = 'none';
+        document.getElementById('loading').style.display = 'block';
+        setTimeout(initPayment, 1000);
+    }
+    
+    function goBack() {
+        window.history.back();
+    }
+    
+    function initPayment() {
+        // Validate required data
+        if (!RAZORPAY_KEY || !PAYMENT_AMOUNT || !RAZORPAY_ORDER_ID) {
+            console.error('Missing payment data:', {
+                key: RAZORPAY_KEY,
+                amount: PAYMENT_AMOUNT,
+                orderId: RAZORPAY_ORDER_ID
+            });
+            showError();
+            return;
+        }
+        
+        // Check if Razorpay is loaded
+        if (typeof Razorpay === 'undefined') {
+            console.error('Razorpay not loaded');
+            showError();
+            return;
+        }
+        
+        try {
+            const options = {
+                key: RAZORPAY_KEY,
+                amount: PAYMENT_AMOUNT,
+                currency: 'INR',
+                name: 'E-Shopping Zone',
+                description: 'Order Payment',
+                order_id: RAZORPAY_ORDER_ID,
+                handler: function(response) {
+                    console.log('Payment successful:', response);
+                    document.querySelector('.container').innerHTML = 
+                        '<div class="spinner"></div><h3>Payment Successful!</h3><p>Redirecting...</p>';
+                    
+                    // Redirect to success page
+                    const callbackUrl = '/payment/payment-callback?' +
+                        'razorpay_order_id=' + encodeURIComponent(response.razorpay_order_id) +
+                        '&razorpay_payment_id=' + encodeURIComponent(response.razorpay_payment_id) +
+                        '&razorpay_signature=' + encodeURIComponent(response.razorpay_signature);
+                    
+                    setTimeout(() => {
+                        window.location.href = callbackUrl;
+                    }, 2000);
+                },
+                modal: {
+                    ondismiss: function() {
+                        console.log('Payment dismissed');
+                        document.querySelector('.container').innerHTML = 
+                            '<h3>Payment Cancelled</h3><p>You cancelled the payment.</p>' +
+                            '<button class="btn" onclick="window.history.back()">Go Back</button>';
+                    }
+                },
+                theme: {
+                    color: '#007bff'
+                }
+            };
+            
+            console.log('Opening Razorpay with options:', options);
+            const rzp = new Razorpay(options);
+            rzp.open();
+            
+        } catch (error) {
+            console.error('Razorpay initialization error:', error);
+            showError();
+        }
+    }
+    
+    // Initialize payment when page loads
+    window.addEventListener('load', function() {
+        console.log('Page loaded, initializing payment in 2 seconds...');
+        setTimeout(initPayment, 2000);
+    });
+    
+    // Timeout fallback
+    setTimeout(function() {
+        if (document.getElementById('loading').style.display !== 'none') {
+            console.error('Payment initialization timeout');
+            showError();
+        }
+    }, 15000);
+</script>
+</body>
+</html>

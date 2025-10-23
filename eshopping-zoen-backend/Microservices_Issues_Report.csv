@@ -1,0 +1,21 @@
+Service,Issue Category,Severity,Issue Description,File Location,Recommended Fix,Priority
+API Gateway,Configuration,Critical,Entire application.yml is commented out - Gateway not functional,APIGateway/src/main/resources/application.yml,Uncomment and configure proper routing rules,High
+API Gateway,Configuration,High,Missing active configuration for service discovery,APIGateway/src/main/resources/application.yml,Enable Eureka client configuration,High
+Payment Service,Security,Medium,Potential XSS vulnerability in Thymeleaf template,PaymentService/src/main/resources/templates/payment.html,Sanitize Thymeleaf expressions and add CSP headers,Medium
+UserService,Dependencies,Medium,Inconsistent Spring Boot version (3.4.4 vs others 3.3.0),UserService/pom.xml,Standardize Spring Boot version across all services,Medium
+ProductService,Dependencies,Low,Outdated testing dependencies (JUnit 5.8.0),ProductService/pom.xml,Update to latest JUnit version,Low
+ProductService,Dependencies,Medium,Inconsistent Spring Cloud version (2023.0.2 vs 2024.0.1),ProductService/pom.xml,Standardize Spring Cloud version,Medium
+All Services,Architecture,High,Missing centralized configuration management,All services,Implement Spring Cloud Config Server,High
+All Services,Monitoring,High,No observability/monitoring configuration,All services,Add Spring Boot Actuator and Micrometer,High
+All Services,Security,High,Missing security configurations in most services,All services,Implement OAuth2/JWT security consistently,High
+All Services,Database,Medium,Hardcoded database configurations,All services,Use environment variables or config server,Medium
+All Services,Error Handling,Medium,No global exception handling,All services,Implement @ControllerAdvice for consistent error handling,Medium
+All Services,Logging,Medium,No structured logging configuration,All services,Configure Logback with JSON format,Medium
+All Services,Testing,High,Missing integration tests,All services,Add comprehensive test coverage,High
+All Services,Documentation,Low,Incomplete API documentation,All services,Complete Swagger/OpenAPI documentation,Low
+EurekaServer,Configuration,Medium,Missing Eureka server configuration validation,EurekaServer,Add proper Eureka server settings,Medium
+All Services,Performance,Medium,No caching strategy implemented,All services,Implement Redis caching where appropriate,Medium
+All Services,Resilience,High,Missing circuit breaker patterns,All services,Add Hystrix or Resilience4j,High
+All Services,Deployment,Medium,No containerization (Docker),All services,Create Dockerfiles and docker-compose,Medium
+All Services,Build,Low,Inconsistent Maven plugin configurations,All services,Standardize Maven build configurations,Low
+All Services,Validation,Medium,Inconsistent input validation across services,All services,Implement consistent validation strategy,Medium

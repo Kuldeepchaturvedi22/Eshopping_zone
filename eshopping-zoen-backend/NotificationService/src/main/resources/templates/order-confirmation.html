@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 30px; text-align: center; }
+        .content { padding: 30px; }
+        .order-box { background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .payment-box { background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .btn { display: inline-block; background-color: #28a745; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 10px 0; }
+        .footer { background-color: #2c3e50; color: white; padding: 20px; text-align: center; font-size: 12px; }
+        .status-badge { background-color: #ffc107; color: #212529; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="margin: 0;">✅ Order Placed Successfully!</h1>
+            <p style="margin: 10px 0 0 0;">Thank you for shopping with E-Shopping Zone</p>
+        </div>
+        
+        <div class="content">
+            <div class="order-box">
+                <h2 style="color: #2c3e50; margin-top: 0;">Order Summary</h2>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Order ID:</strong></td>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #eee;" th:text="${orderId}">#12345</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Order Date:</strong></td>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #eee;" th:text="${orderDate}">2024-01-15</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Total Amount:</strong></td>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong th:text="'₹' + ${totalAmount}">₹1,299.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0;"><strong>Status:</strong></td>
+                        <td style="padding: 8px 0;"><span class="status-badge">Pending Payment</span></td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="payment-box">
+                <h3 style="margin-top: 0; color: #856404;">⚠️ Payment Required</h3>
+                <p>Your order has been successfully placed but requires payment to be confirmed. Please complete your payment using the secure link below:</p>
+                <div style="text-align: center; margin: 20px 0;">
+                    <a th:href="${paymentLink}" class="btn">Complete Payment Now</a>
+                </div>
+                <p style="font-size: 12px; color: #6c757d; margin-bottom: 0;">
+                    <strong>Note:</strong> Your order will be processed only after successful payment completion.
+                </p>
+            </div>
+            
+            <h3 style="color: #2c3e50;">What Happens Next?</h3>
+            <ol>
+                <li><strong>Complete Payment:</strong> Click the payment link above to secure your order</li>
+                <li><strong>Order Processing:</strong> We'll prepare your items for shipment</li>
+                <li><strong>Shipping:</strong> You'll receive tracking information via email</li>
+                <li><strong>Delivery:</strong> Your order will arrive within 3-5 business days</li>
+            </ol>
+            
+            <div style="background-color: #e8f4fd; border-left: 4px solid #0066cc; padding: 15px; margin: 20px 0;">
+                <p style="margin: 0;"><strong>Need Help?</strong> Our customer service team is available 24/7 to assist you with any questions about your order.</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>E-Shopping Zone Inc.</strong></p>
+            <p>📧 support@e-shopping-zone.com | 📞 +1-800-123-4567</p>
+            <p>Track your order: <a href="http://localhost:3000/orders" style="color: #20c997;">View My Orders</a></p>
+            <p style="margin-top: 15px; font-size: 10px;">© 2024 E-Shopping Zone. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

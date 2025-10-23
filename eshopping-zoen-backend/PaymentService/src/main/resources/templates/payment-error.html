@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Error - E-Shopping Zone</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .error-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+        }
+        .error-icon {
+            color: #e74c3c;
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        p {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        .error-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #e74c3c;
+        }
+        .error-code {
+            font-family: monospace;
+            color: #e74c3c;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">⚠️</div>
+        <h2>Payment Error</h2>
+        <p th:text="${error ?: 'We encountered an issue while processing your payment. Please try again or contact support if the problem persists.'}">
+            We encountered an issue while processing your payment.
+        </p>
+        
+        <div class="error-details" th:if="${errorCode}">
+            <div class="error-code" th:text="'Error Code: ' + ${errorCode}">Error Code: PAYMENT_001</div>
+        </div>
+        
+        <div>
+            <button class="btn" onclick="retryPayment()">Try Again</button>
+            <button class="btn btn-secondary" onclick="goToCart()">Back to Cart</button>
+            <a href="/" class="btn btn-secondary">Home</a>
+        </div>
+        
+        <p style="margin-top: 30px; font-size: 12px; color: #bdc3c7;">
+            Need help? Contact our support team at support@eshoppingzone.com
+        </p>
+    </div>
+
+    <script>
+        function retryPayment() {
+            // Go back to previous page (order page)
+            if (document.referrer && document.referrer.includes('order')) {
+                window.location.href = document.referrer;
+            } else {
+                window.history.back();
+            }
+        }
+        
+        function goToCart() {
+            // Redirect to cart page
+            window.location.href = '/cart';
+        }
+        
+        // Auto-redirect after 30 seconds if no action
+        setTimeout(() => {
+            if (confirm('Would you like to return to your cart?')) {
+                goToCart();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

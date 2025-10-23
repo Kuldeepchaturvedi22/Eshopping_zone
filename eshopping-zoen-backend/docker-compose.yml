@@ -1,0 +1,210 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: Admin@12345678
+      MYSQL_DATABASE: ecommerce
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - microservices-network
+
+  # Redis for Caching
+  redis:
+    image: redis:7-alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    networks:
+      - microservices-network
+
+  # Eureka Server
+  eureka-server:
+    build: ./EurekaServer
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # API Gateway
+  api-gateway:
+    build: ./APIGateway
+    container_name: api-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-network
+
+  # User Service
+  user-service:
+    build: ./UserService
+    container_name: user-service
+    ports:
+      - "8001:8001"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL=jdbc:mysql://mysql:3306/userservice?createDatabaseIfNotExist=true
+      - DB_USERNAME=root
+      - DB_PASSWORD=Admin@12345678
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - mysql
+      - eureka-server
+    networks:
+      - microservices-network
+
+  # Product Service
+  product-service:
+    build: ./ProductService
+    container_name: product-service
+    ports:
+      - "8002:8002"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL=jdbc:mysql://mysql:3306/productservice?createDatabaseIfNotExist=true
+      - DB_USERNAME=root
+      - DB_PASSWORD=Admin@12345678
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - mysql
+      - eureka-server
+    networks:
+      - microservices-network
+
+  # Cart Service
+  cart-service:
+    build: ./CartService
+    container_name: cart-service
+    ports:
+      - "8003:8003"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL=jdbc:mysql://mysql:3306/cartservice?createDatabaseIfNotExist=true
+      - DB_USERNAME=root
+      - DB_PASSWORD=Admin@12345678
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - mysql
+      - redis
+      - eureka-server
+    networks:
+      - microservices-network
+
+  # Order Service
+  order-service:
+    build: ./OrderService
+    container_name: order-service
+    ports:
+      - "8004:8004"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL=jdbc:mysql://mysql:3306/orderservice?createDatabaseIfNotExist=true
+      - DB_USERNAME=root
+      - DB_PASSWORD=Admin@12345678
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - mysql
+      - eureka-server
+    networks:
+      - microservices-network
+
+  # Payment Service
+  payment-service:
+    build: ./PaymentService
+    container_name: payment-service
+    ports:
+      - "8005:8005"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL=jdbc:mysql://mysql:3306/paymentservice?createDatabaseIfNotExist=true
+      - DB_USERNAME=root
+      - DB_PASSWORD=Admin@12345678
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - mysql
+      - eureka-server
+    networks:
+      - microservices-network
+
+  # Notification Service
+  notification-service:
+    build: ./NotificationService
+    container_name: notification-service
+    ports:
+      - "8006:8006"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+    networks:
+      - microservices-network
+
+  # Prometheus for Metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - microservices-network
+
+  # Frontend React App
+  frontend:
+    build: ./eshopping-zone
+    container_name: frontend
+    ports:
+      - "3000:80"
+    environment:
+      - API_URL=http://api-gateway:8000
+      - APP_NAME=E-Shopping Zone
+      - RAZORPAY_KEY=your_razorpay_key
+    depends_on:
+      - api-gateway
+    networks:
+      - microservices-network
+
+  # Grafana for Monitoring Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - microservices-network
+
+volumes:
+  mysql_data:
+  grafana_data:
+
+networks:
+  microservices-network:
+    driver: bridge
